@@ -1,7 +1,5 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 
-import {EventSubscriptionType} from '../dispatcher';
-
 import {
   FieldType,
   FieldValueType,
@@ -20,13 +18,13 @@ export function usePoolState<T extends FieldType>({
   /**
    * To ensure that state's watching is fired synchronously, immediately right after state's declaration
    */
-  const fieldSubscriptionRef = useRef<EventSubscriptionType | undefined>(
-    disabled
+  const hookRef = useRef<any>({
+    fieldSub: disabled
       ? undefined
       : pool.__ev__.subscribe(fieldName, ({data}) => {
           setState(data[fieldName]);
         }),
-  );
+  });
 
   const updateField = useCallback(
     (
@@ -40,23 +38,28 @@ export function usePoolState<T extends FieldType>({
   );
 
   useEffect(() => {
-    if (disabled || fieldSubscriptionRef.current) {
+    if (disabled) {
+      hookRef.current?.fieldSub?.unsubscribe?.();
+      hookRef.current.fieldSub = undefined;
+      return;
+    }
+
+    if (hookRef.current) {
       return;
     }
 
     setState(pool.getValue(fieldName));
-    fieldSubscriptionRef.current = pool.__ev__.subscribe(
-      fieldName,
-      ({data}) => {
-        setState(data[fieldName]);
-      },
-    );
-
-    return () => {
-      fieldSubscriptionRef.current?.unsubscribe();
-      fieldSubscriptionRef.current = undefined;
-    };
+    hookRef.current.fieldSub = pool.__ev__.subscribe(fieldName, ({data}) => {
+      setState(data[fieldName]);
+    });
   }, [disabled]);
+
+  useEffect(() => {
+    return () => {
+      hookRef.current?.fieldSub?.unsubscribe();
+      hookRef.current.fieldSub = undefined;
+    };
+  }, []);
 
   return [state as FieldValueType<T>, updateField];
 }

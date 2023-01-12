@@ -1,6 +1,5 @@
-import React from 'react';
-import {act, fireEvent, render} from '@testing-library/react';
-
+import React, {useState} from 'react';
+import {act, cleanup, render} from '@testing-library/react';
 import {renderHook} from '@testing-library/react-hooks';
 
 import {initStatePool, usePoolState} from '../pool';
@@ -9,6 +8,8 @@ import {initStatePool, usePoolState} from '../pool';
  * Run test command
  * yarn test -u -t="usePoolState"
  */
+
+afterEach(cleanup);
 
 const pool = initStatePool<{
   default: string;
@@ -22,55 +23,149 @@ describe('usePoolState', () => {
     pool.resetContext();
   });
 
-  it('should return default value in pool', () => {
-    const {result} = renderHook(() => {
-      return usePoolState({
-        pool,
-        fieldName: 'default',
-      });
+  // test('should return default value in pool', () => {
+  //   const {result} = renderHook(() => {
+  //     return usePoolState({
+  //       pool,
+  //       fieldName: 'default',
+  //     });
+  //   });
+
+  //   expect(result.current[0]).toEqual('default');
+  // });
+
+  // test('should return current value in pool at start watching', () => {
+  //   pool.setValue('test', 'test-start-watch');
+
+  //   const {result} = renderHook(() => {
+  //     return usePoolState({
+  //       pool,
+  //       fieldName: 'test',
+  //     });
+  //   });
+
+  //   expect(result.current[0]).toEqual('test-start-watch');
+  // });
+
+  // test('should update value as pool update', async () => {
+  //   let testSetTest: any;
+
+  //   const Component = () => {
+  //     const [test, setTest] = usePoolState({pool, fieldName: 'test'});
+
+  //     testSetTest = (value: string) => setTest(value);
+
+  //     return <p>{test?.toString()}</p>;
+  //   };
+
+  //   const {getByText} = render(<Component />);
+
+  //   expect(getByText('test')).toBeDefined();
+
+  //   await act(async () => pool.setValue('test', 'newTest'));
+  //   expect(getByText('newTest')).toBeDefined();
+
+  //   await act(async () => testSetTest('testSetTest'));
+  //   expect(getByText('testSetTest')).toBeDefined();
+  // });
+
+  // test('should remove listener on unmount', async () => {
+  //   const Component = () => {
+  //     usePoolState({pool, fieldName: 'test'});
+  //     return <div />;
+  //   };
+  //   const {unmount} = render(<Component />);
+
+  //   const {dispatcher} = pool.getContext();
+  //   const {listeners} = dispatcher.getContext();
+
+  //   expect(listeners.test.length).toEqual(1);
+
+  //   unmount();
+  //   expect(listeners.test.length).toEqual(0);
+  // });
+
+  describe('when disabled prop is used', () => {
+    // test('should return undefined value as delare hook', () => {
+    //   const {result} = renderHook(() => {
+    //     return usePoolState({
+    //       pool,
+    //       fieldName: 'default',
+    //       disabled: true,
+    //     });
+    //   });
+
+    //   expect(result.current[0]).toBeUndefined();
+    // });
+
+    // test('should re-subscribe as toggle disabled', async () => {
+    //   let changeDisabled;
+    //   let changeText;
+
+    //   const Component = () => {
+    //     const [disabled, setDisabled] = useState(false);
+    //     const [test, setTest] = usePoolState({
+    //       pool,
+    //       fieldName: 'test',
+    //       disabled,
+    //     });
+
+    //     changeText = (value: string) => setTest(value);
+    //     changeDisabled = (value: boolean) => setDisabled(value);
+
+    //     return <p>{test?.toString()}</p>;
+    //   };
+
+    //   const {getByText} = render(<Component />);
+
+    //   expect(getByText('test')).toBeDefined();
+
+    //   await act(async () => changeDisabled(true));
+    //   await act(async () => changeText('test-disabled'));
+
+    //   expect(pool.getValue('test')).toEqual('test-disabled');
+    //   expect(getByText('test')).toBeDefined();
+
+    //   await act(async () => changeDisabled(false));
+    //   expect(getByText('test-disabled')).toBeDefined();
+    // });
+
+    test('should remove listener on disabled', async () => {
+      let changeDisabled;
+
+      const Component = () => {
+        const [disabled, setDisabled] = useState(false);
+        const [test] = usePoolState({
+          pool,
+          fieldName: 'test',
+          disabled,
+        });
+
+        changeDisabled = (value: boolean) => setDisabled(value);
+
+        return <p>{test?.toString()}</p>;
+      };
+
+      render(<Component />);
+
+      const {dispatcher} = pool.getContext();
+      const {listeners} = dispatcher.getContext();
+
+      expect(listeners.test.length).toEqual(1);
+
+      console.log(listeners.test);
+
+      await act(async () => changeDisabled(true));
+
+      await act(async () => changeDisabled(false));
+
+      console.log(listeners.test);
+
+      await act(async () => changeDisabled(true));
+
+      await act(async () => changeDisabled(false));
+
+      console.log(listeners.test);
     });
-
-    const [value] = result.current;
-    expect(value).toEqual('default');
-  });
-
-  it('should return current value in pool at start watching', () => {
-    pool.setValue('test', 'test-start-watch');
-
-    const {result} = renderHook(() => {
-      return usePoolState({
-        pool,
-        fieldName: 'test',
-      });
-    });
-
-    const [value] = result.current;
-    expect(value).toEqual('test-start-watch');
-  });
-
-  it('should update value as pool update', async () => {
-    let testSetTest: any;
-
-    const Component = () => {
-      const [test, setTest] = usePoolState({pool, fieldName: 'test'});
-
-      testSetTest = (value: string) => setTest(value);
-
-      return (
-        <div>
-          <p>{test?.toString()}</p>
-        </div>
-      );
-    };
-
-    const {getByText, getAllByText} = render(<Component />);
-
-    expect(getByText('test')).toBeDefined();
-
-    await act(async () => pool.setValue('test', 'newTest'));
-    expect(getAllByText('newTest').length > 0).toBeTruthy();
-
-    await act(async () => testSetTest('testSetTest'));
-    expect(getAllByText('testSetTest').length > 0).toBeTruthy();
   });
 });

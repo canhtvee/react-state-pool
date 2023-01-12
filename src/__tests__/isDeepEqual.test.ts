@@ -6,7 +6,7 @@ import {isDeepEqual} from '../utils';
  */
 
 describe('isDeepEqual', () => {
-  it('should return false when two sets not match', () => {
+  test('should return false when two sets not match', () => {
     expect(
       isDeepEqual([{test: '123'}, {test: '455'}, {test: '455'}], []),
     ).toBeFalsy();
@@ -39,14 +39,14 @@ describe('isDeepEqual', () => {
     ).toBeFalsy();
   });
 
-  it('should return false when either type is primitive', () => {
+  test('should return false when either type is primitive', () => {
     expect(isDeepEqual(null, [])).toBeFalsy();
     expect(isDeepEqual([], null)).toBeFalsy();
     expect(isDeepEqual({}, undefined)).toBeFalsy();
     expect(isDeepEqual(undefined, {})).toBeFalsy();
   });
 
-  it('should return true when two sets matches', () => {
+  test('should return true when two sets matches', () => {
     expect(
       isDeepEqual([{name: 'useFieldArray'}], [{name: 'useFieldArray'}]),
     ).toBeTruthy();
@@ -117,7 +117,7 @@ describe('isDeepEqual', () => {
     ).toBeTruthy();
   });
 
-  it('should compare date time object valueOf', () => {
+  test('should compare date time object valueOf', () => {
     expect(
       isDeepEqual({test: new Date('1990')}, {test: new Date('1990')}),
     ).toBeTruthy();
