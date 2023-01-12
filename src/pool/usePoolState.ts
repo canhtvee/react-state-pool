@@ -1,11 +1,8 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 
-import {
-  FieldType,
-  FieldValueType,
-  UsePoolStateArgmentType,
-  UsePoolStateReturnType,
-} from './types';
+import {FieldType, FieldValueType} from '../room';
+
+import {UsePoolStateArgmentType, UsePoolStateReturnType} from './types';
 
 export function usePoolState<T extends FieldType>({
   fieldName,
