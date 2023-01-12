@@ -9,10 +9,10 @@ import {act} from '@testing-library/react';
 
 describe('initStatePool', () => {
   test('should getContext correctly', () => {
-    const pool = initStatePool({}).getContext();
+    const {room, dispatcher} = initStatePool({}).getContext();
 
-    expect(pool.dispatcher).toBeDefined();
-    expect(pool.current).toBeDefined();
+    expect(dispatcher).toBeDefined();
+    expect(room).toBeDefined();
   });
 
   test('should init correctly', () => {
@@ -20,10 +20,10 @@ describe('initStatePool', () => {
       mField: 'mField',
       mObject: {field1: 'field1', field2: 'field2'},
     };
-    const context = initStatePool(initData).getContext();
+    const {room, dispatcher} = initStatePool(initData).getContext();
 
-    expect(context.dispatcher).toBeDefined();
-    expect(isDeepEqual(context.current, initData)).toBeTruthy();
+    expect(dispatcher).toBeDefined();
+    expect(isDeepEqual(room.getAll(), initData)).toBeTruthy();
   });
 
   test('should getValue of single field correctly', () => {

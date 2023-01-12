@@ -1,75 +1,69 @@
 import {isArray, isFunction} from '../utils';
 import {initDispatcher, EventSubscriptionType} from '../dispatcher';
-
 import {
   FieldPathType,
   FieldType,
   FieldValueType,
+  initRoom,
   PartialFieldType,
-  PoolListenerType,
-  PoolEventType,
-  StatePoolType,
-} from './types';
+} from '../room';
+
+import {PoolListenerType, PoolEventType, StatePoolType} from './types';
 
 export function initStatePool<T extends FieldType>(
   initialData: T,
 ): StatePoolType<T> {
-  let current = {...initialData};
+  const room = initRoom<T>(initialData);
   const dispatcher = initDispatcher<PoolEventType<T>>();
 
-  function resetContext() {
-    current = {...initialData};
+  const resetContext = () => {
+    room.resetContext();
     dispatcher.resetContext();
-  }
-  function getContext() {
-    return {
-      dispatcher,
-      current,
-    };
-  }
+  };
+  const getContext = () => ({
+    dispatcher,
+    room,
+  });
 
   function getValue(
     fieldName?: FieldPathType<T> | Array<FieldPathType<T>>,
   ): FieldValueType<T> | PartialFieldType<T> | T {
     if (!fieldName) {
-      return current;
+      return room.getAll();
     }
-    if (!isArray(fieldName)) {
-      return current[fieldName];
+    if (isArray(fieldName)) {
+      return room.getMultiple(fieldName);
     }
-
-    const values: PartialFieldType<T> = {};
-    fieldName.forEach(
-      _name => !!current[_name] && (values[_name] = current[_name]),
-    );
-    return values;
+    return room.getSingle(fieldName);
   }
 
-  function setValue(
+  const setValue = (
     fieldName: FieldPathType<T>,
     updatingValue:
       | FieldValueType<T>
       | ((prev: FieldValueType<T>) => FieldValueType<T>),
-  ) {
+  ) => {
     const newValue = isFunction(updatingValue)
-      ? updatingValue(current[fieldName])
+      ? updatingValue(room.getSingle(fieldName))
       : updatingValue;
 
-    current = {...current, [fieldName]: newValue};
+    room.set(fieldName, newValue);
 
-    const Event = {
+    dispatcher.dispatch({
       eventName: fieldName,
       data: {[fieldName]: newValue},
-    };
-
-    dispatcher.dispatch(Event as PoolEventType<T>);
-  }
+    } as PoolEventType<T>);
+  };
 
   function subscribe(
     fieldName: FieldPathType<T> | Array<FieldPathType<T>>,
     listener: PoolListenerType<T>,
   ): EventSubscriptionType {
-    return dispatcher.addSubscription(fieldName, listener);
+    if (isArray(fieldName)) {
+      return dispatcher.addMultipleSub(fieldName, listener);
+    }
+
+    return dispatcher.addSingleSub(fieldName, listener);
   }
 
   return {

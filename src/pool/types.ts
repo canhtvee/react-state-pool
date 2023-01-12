@@ -4,15 +4,13 @@ import {
   EventSubscriptionType,
 } from '../dispatcher';
 
-export type FieldType = Record<string, any>;
-
-export type FieldPathType<T extends FieldType> = `${keyof T & string}`;
-
-export type FieldValueType<T extends FieldType> = T[FieldPathType<T>];
-
-export type PartialFieldType<T extends FieldType> = {
-  [P in FieldPathType<T>]?: T[P];
-};
+import {
+  FieldPathType,
+  FieldType,
+  FieldValueType,
+  PartialFieldType,
+  RoomType,
+} from '../room';
 
 export type PoolEventType<T extends FieldType> = {
   eventName: FieldPathType<T>;
@@ -28,7 +26,7 @@ export type StatePoolType<T extends FieldType> = {
 
   getContext: () => {
     dispatcher: DispatcherType<PoolEventType<T>>;
-    current: T;
+    room: RoomType<T>;
   };
 
   setValue: (

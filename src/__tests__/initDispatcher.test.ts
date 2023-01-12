@@ -12,7 +12,7 @@ describe('initDispatcher', () => {
     const mockEventName = 'test-getContext';
 
     const dispatcher = initDispatcher();
-    dispatcher.addSubscription(mockEventName, mockListener);
+    dispatcher.addSingleSub(mockEventName, mockListener);
 
     const context = dispatcher.getContext();
     expect(context.listeners).toBeDefined();
@@ -23,10 +23,7 @@ describe('initDispatcher', () => {
     const mockEventName = 'test-adSubscription';
 
     const dispatcher = initDispatcher();
-    const subscriptions = dispatcher.addSubscription(
-      mockEventName,
-      mockListener,
-    );
+    const subscriptions = dispatcher.addSingleSub(mockEventName, mockListener);
 
     const {listeners} = dispatcher.getContext();
     expect(listeners[mockEventName].length).toBe(1);
@@ -39,7 +36,7 @@ describe('initDispatcher', () => {
     const mockEventName = 'test-dispatch';
 
     const dispatcher = initDispatcher();
-    dispatcher.addSubscription(mockEventName, mockListener);
+    dispatcher.addSingleSub(mockEventName, mockListener);
 
     const mockEvent = {
       eventName: mockEventName,
@@ -60,10 +57,7 @@ describe('initDispatcher', () => {
     const mockEventName = 'test-unsubscribe';
 
     const dispatcher = initDispatcher();
-    const subscriptions = dispatcher.addSubscription(
-      mockEventName,
-      mockListener,
-    );
+    const subscriptions = dispatcher.addSingleSub(mockEventName, mockListener);
     expect(isFunction(subscriptions.unsubscribe)).toBeTruthy();
 
     subscriptions.unsubscribe();
@@ -78,7 +72,7 @@ describe('initDispatcher', () => {
     const mockEventName = 'test-resetContext';
 
     const dispatcher = initDispatcher();
-    dispatcher.addSubscription(mockEventName, mockListener);
+    dispatcher.addSingleSub(mockEventName, mockListener);
 
     const {listeners: listenersBeforeReset} = dispatcher.getContext();
     expect(listenersBeforeReset[mockEventName].length).toBe(1);

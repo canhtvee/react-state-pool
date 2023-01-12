@@ -19,12 +19,18 @@ export function usePoolState<T extends FieldType>({
    * To ensure that state's watching is fired synchronously, immediately right after state's declaration
    */
   const hookRef = useRef<any>({
-    fieldSub: disabled
+    isMounting: true,
+    fieldSub: undefined,
+  });
+
+  if (hookRef.current.isMounting) {
+    hookRef.current.fieldSub = disabled
       ? undefined
       : pool.__ev__.subscribe(fieldName, ({data}) => {
           setState(data[fieldName]);
-        }),
-  });
+        });
+    hookRef.current.isMounting = false;
+  }
 
   const updateField = useCallback(
     (
@@ -39,12 +45,12 @@ export function usePoolState<T extends FieldType>({
 
   useEffect(() => {
     if (disabled) {
-      hookRef.current?.fieldSub?.unsubscribe?.();
+      hookRef.current.fieldSub?.unsubscribe?.();
       hookRef.current.fieldSub = undefined;
       return;
     }
 
-    if (hookRef.current) {
+    if (hookRef.current.fieldSub) {
       return;
     }
 

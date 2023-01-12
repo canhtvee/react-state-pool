@@ -1,4 +1,4 @@
-import {isArray} from '../utils';
+import {cloneObject} from '../utils';
 
 import {
   EventType,
@@ -10,53 +10,55 @@ import {
 export function initDispatcher<E extends EventType>(): DispatcherType<E> {
   let listeners: Record<string, Array<EventListenerType<E>>> = {};
 
-  function resetContext() {
+  const resetContext = () => {
     listeners = {};
-  }
-  function getContext() {
+  };
+  const getContext = () => {
     return {listeners};
-  }
+  };
 
-  function addListener(
+  const _addListener = (
     eventName: E['eventName'],
     listener: EventListenerType<E>,
-  ) {
-    if (!listeners[eventName]) {
-      listeners[eventName] = [];
-    }
+  ) => {
+    !listeners[eventName] && (listeners[eventName] = []);
 
     listeners[eventName].push(listener);
     return () => {
       listeners[eventName] = listeners[eventName].filter(_f => _f !== listener);
     };
-  }
+  };
 
-  function addSubscription(
-    eventName: E['eventName'] | Array<E['eventName']>,
+  const addSingleSub = (
+    eventName: E['eventName'],
     listener: EventListenerType<E>,
-  ): EventSubscriptionType {
-    if (!isArray(eventName)) {
-      return {
-        unsubscribe: addListener(eventName, listener),
-      };
-    }
+  ): EventSubscriptionType => {
+    return {
+      unsubscribe: _addListener(eventName, listener),
+    };
+  };
 
+  const addMultipleSub = (
+    eventName: Array<E['eventName']>,
+    listener: EventListenerType<E>,
+  ): EventSubscriptionType => {
     const _removeListeners = eventName.map(_eventName =>
-      addListener(_eventName, listener),
+      _addListener(_eventName, listener),
     );
     return {
       unsubscribe: () => _removeListeners.forEach(_f => _f()),
     };
-  }
+  };
 
-  function dispatch(Event: E) {
-    listeners[Event.eventName]?.forEach(_f => _f(Event));
-  }
+  const dispatch = (Event: E) => {
+    listeners[Event.eventName]?.forEach(_f => _f(cloneObject(Event)));
+  };
 
   return {
     resetContext,
     getContext,
-    addSubscription,
+    addSingleSub,
+    addMultipleSub,
     dispatch,
   };
 }

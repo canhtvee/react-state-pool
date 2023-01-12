@@ -11,9 +11,15 @@ export type EventSubscriptionType = {
 
 export type DispatcherType<E extends EventType> = {
   resetContext: () => void;
-  getContext: () => {listeners: Record<string, Array<EventListenerType<E>>>};
-  addSubscription: (
-    eventName: E['eventName'] | Array<E['eventName']>,
+  getContext: () => {
+    listeners: Record<string, EventListenerType<E>[]>;
+  };
+  addSingleSub: (
+    eventName: E['eventName'],
+    listener: EventListenerType<E>,
+  ) => EventSubscriptionType;
+  addMultipleSub: (
+    eventName: Array<E['eventName']>,
     listener: EventListenerType<E>,
   ) => EventSubscriptionType;
   dispatch: (Event: E) => void;
