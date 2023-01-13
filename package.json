@@ -25,8 +25,8 @@
     "lint": "eslint '**/*.{js,ts}'",
     "lint:fix": "yarn lint -- --fix",
     "clean": "rm -r dist",
-    "prebuild": "yarn clean",
-    "build": "tsc --build"
+    "tsc": "tsc --build",
+    "build": "yarn clean; yarn tsc"
   },
   "dependencies": {},
   "devDependencies": {
