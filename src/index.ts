@@ -1,2 +1,2 @@
-export * from './dispatcher';
+export * from './event';
 export * from './pool';

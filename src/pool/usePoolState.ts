@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 
-import {FieldType, FieldValueType} from '../room';
+import {FieldType, FieldValueType} from '../field';
 
 import {UsePoolStateArgmentType, UsePoolStateReturnType} from './types';
 
