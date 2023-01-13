@@ -1,41 +1,34 @@
-import {
-  FieldPathType,
-  FieldType,
-  FieldValueType,
-  PartialFieldType,
-  RoomType,
-} from './types';
-import {cloneObject} from '../utils';
+import {FieldPath, Field, FieldValue, Room, FieldValues} from './types';
+import {cloneObject, isArray} from '../utils';
 
-export function initRoom<T extends FieldType>(initialData: T): RoomType<T> {
+export function initRoom<T extends Field>(initialData: T): Room<T> {
   let current = {...cloneObject(initialData)};
 
   const resetContext = () => {
     current = {...cloneObject(initialData)};
   };
 
-  const set = (fieldName: FieldPathType<T>, value: FieldValueType<T>) => {
+  const set = (fieldName: FieldPath<T>, value: FieldValue<T, FieldPath<T>>) => {
     current[fieldName] = cloneObject(value);
   };
 
-  const getAll = () => cloneObject(current);
+  const get = (fieldName: FieldPath<T>[] | FieldPath<T>) => {
+    if (!fieldName) {
+      return cloneObject(current);
+    }
 
-  const getSingle = (fieldName: FieldPathType<T>) =>
-    cloneObject(current[fieldName]);
+    if (isArray(fieldName)) {
+      const values: FieldValues<T, FieldPath<T>[]> = [];
+      fieldName.map(_name => current[_name]);
+      return cloneObject(values);
+    }
 
-  const getMultiple = (fieldName: Array<FieldPathType<T>>) => {
-    const values: PartialFieldType<T> = {};
-    fieldName.forEach(
-      _name => !!current[_name] && (values[_name] = current[_name]),
-    );
-    return cloneObject(values);
+    return cloneObject(current[fieldName]);
   };
 
   return {
     set,
-    getAll,
-    getSingle,
-    getMultiple,
+    get,
     resetContext,
-  };
+  } as Room<T>;
 }

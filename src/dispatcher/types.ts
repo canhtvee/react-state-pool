@@ -1,26 +1,25 @@
-export type EventType = {
+export type Event = {
   eventName: string;
   data?: Record<string, any>;
 };
 
-export type EventListenerType<E extends EventType> = (Event: E) => void;
+export type EventListener<E extends Event> = (Event: E) => void;
 
-export type EventSubscriptionType = {
+export type EventSubscription = {
   unsubscribe: () => void;
 };
 
-export type DispatcherType<E extends EventType> = {
+export type Dispatcher<E extends Event> = {
   resetContext: () => void;
+
   getContext: () => {
-    listeners: Record<string, EventListenerType<E>[]>;
+    listeners: Record<string, EventListener<E>[]>;
   };
-  addSingleSub: (
-    eventName: E['eventName'],
-    listener: EventListenerType<E>,
-  ) => EventSubscriptionType;
-  addMultipleSub: (
-    eventName: Array<E['eventName']>,
-    listener: EventListenerType<E>,
-  ) => EventSubscriptionType;
+
+  addSub: (
+    eventName: E['eventName'] | E['eventName'][],
+    listener: EventListener<E>,
+  ) => EventSubscription;
+
   dispatch: (Event: E) => void;
 };

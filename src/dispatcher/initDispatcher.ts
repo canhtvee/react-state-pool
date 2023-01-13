@@ -1,14 +1,9 @@
-import {cloneObject} from '../utils';
+import {cloneObject, isArray} from '../utils';
 
-import {
-  EventType,
-  EventListenerType,
-  EventSubscriptionType,
-  DispatcherType,
-} from './types';
+import {Event, EventListener, EventSubscription, Dispatcher} from './types';
 
-export function initDispatcher<E extends EventType>(): DispatcherType<E> {
-  let listeners: Record<string, Array<EventListenerType<E>>> = {};
+export function initDispatcher<E extends Event>(): Dispatcher<E> {
+  let listeners: Record<string, Array<EventListener<E>>> = {};
 
   const resetContext = () => {
     listeners = {};
@@ -19,7 +14,7 @@ export function initDispatcher<E extends EventType>(): DispatcherType<E> {
 
   const _addListener = (
     eventName: E['eventName'],
-    listener: EventListenerType<E>,
+    listener: EventListener<E>,
   ) => {
     !listeners[eventName] && (listeners[eventName] = []);
 
@@ -29,36 +24,32 @@ export function initDispatcher<E extends EventType>(): DispatcherType<E> {
     };
   };
 
-  const addSingleSub = (
-    eventName: E['eventName'],
-    listener: EventListenerType<E>,
-  ): EventSubscriptionType => {
+  const addSub = (
+    eventName: E['eventName'] | E['eventName'][],
+    listener: EventListener<E>,
+  ): EventSubscription => {
+    if (isArray(eventName)) {
+      const _removeListeners = eventName.map(_eventName =>
+        _addListener(_eventName, listener),
+      );
+      return {
+        unsubscribe: () => _removeListeners.forEach(_f => _f()),
+      };
+    }
+
     return {
       unsubscribe: _addListener(eventName, listener),
     };
   };
 
-  const addMultipleSub = (
-    eventName: Array<E['eventName']>,
-    listener: EventListenerType<E>,
-  ): EventSubscriptionType => {
-    const _removeListeners = eventName.map(_eventName =>
-      _addListener(_eventName, listener),
-    );
-    return {
-      unsubscribe: () => _removeListeners.forEach(_f => _f()),
-    };
-  };
-
-  const dispatch = (Event: E) => {
-    listeners[Event.eventName]?.forEach(_f => _f(cloneObject(Event)));
+  const dispatch = (event: E) => {
+    listeners[event.eventName]?.forEach(_f => _f(cloneObject(event)));
   };
 
   return {
     resetContext,
     getContext,
-    addSingleSub,
-    addMultipleSub,
+    addSub,
     dispatch,
   };
 }

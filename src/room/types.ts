@@ -1,17 +1,29 @@
-export type FieldType = Record<string, any>;
+export type Field = Record<string, any>;
 
-export type FieldPathType<T extends FieldType> = `${keyof T & string}`;
+export type FieldPath<T extends Field> = `${keyof T & string}`;
 
-export type FieldValueType<T extends FieldType> = T[FieldPathType<T>];
+export type FieldValue<
+  T extends Field,
+  P extends FieldPath<T> = FieldPath<T>,
+> = T[P];
 
-export type PartialFieldType<T extends FieldType> = {
-  [P in FieldPathType<T>]?: T[P];
+export type FieldValues<T extends Field, P extends FieldPath<T>[]> = {} & {
+  [K in keyof P]: FieldValue<T, P[K]>;
 };
 
-export type RoomType<T extends FieldType> = {
-  set: (fieldName: FieldPathType<T>, value: FieldValueType<T>) => void;
-  getAll: () => any;
-  getSingle: (fieldName: FieldPathType<T>) => any;
-  getMultiple: (fieldName: Array<FieldPathType<T>>) => any;
+export type RoomSet<T extends Field> = <P extends FieldPath<T>>(
+  fieldName: P,
+  value: FieldValue<T, P>,
+) => void;
+
+export type RoomGet<T extends Field> = {
+  (): T;
+  <P extends FieldPath<T>>(fieldName: P): FieldValue<T, P>;
+  <P extends FieldPath<T>[]>(fieldName: P): FieldValues<T, P>;
+};
+
+export type Room<T extends Field> = {
+  set: RoomSet<T>;
+  get: RoomGet<T>;
   resetContext: () => void;
 };
