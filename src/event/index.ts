@@ -1,2 +1,4 @@
 export * from './types';
-export * from './sevices';
+export * from './dispatchEvent';
+export * from './addEventSubscription';
+export * from './addListener';

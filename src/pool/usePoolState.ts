@@ -1,14 +1,18 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 
-import {FieldType, FieldValueType} from '../field';
+import {Field, FieldPath} from '../field';
 
-import {UsePoolStateArgmentType, UsePoolStateReturnType} from './types';
+import {
+  StatePoolUpdatingValue,
+  UsePoolStateProps,
+  UsePoolStateReturns,
+} from './types';
 
-export function usePoolState<T extends FieldType>({
+export function usePoolState<T extends Field, P extends FieldPath<T>>({
   fieldName,
   disabled,
   pool,
-}: UsePoolStateArgmentType<T>): UsePoolStateReturnType<T> {
+}: UsePoolStateProps<T, P>): UsePoolStateReturns<T, P> {
   const [state, setState] = useState(() =>
     disabled ? undefined : pool.getValue(fieldName),
   );
@@ -23,22 +27,26 @@ export function usePoolState<T extends FieldType>({
   if (hookRef.current.isMounting) {
     hookRef.current.fieldSub = disabled
       ? undefined
-      : pool.__ev__.subscribe(fieldName, ({data}) => {
+      : pool.__ev__.addSub(fieldName, ({data}) => {
           setState(data[fieldName]);
         });
-    hookRef.current.isMounting = false;
   }
 
   const updateField = useCallback(
-    (
-      updatingValue:
-        | FieldValueType<T>
-        | ((prev: FieldValueType<T>) => FieldValueType<T>),
-    ) => {
+    (updatingValue: StatePoolUpdatingValue<T, P>) => {
       pool.setValue(fieldName, updatingValue);
     },
     [setState, fieldName],
   );
+
+  useEffect(() => {
+    hookRef.current.isMounting = false;
+
+    return () => {
+      hookRef.current?.fieldSub?.unsubscribe();
+      hookRef.current.fieldSub = undefined;
+    };
+  }, []);
 
   useEffect(() => {
     if (disabled) {
@@ -52,17 +60,10 @@ export function usePoolState<T extends FieldType>({
     }
 
     setState(pool.getValue(fieldName));
-    hookRef.current.fieldSub = pool.__ev__.subscribe(fieldName, ({data}) => {
+    hookRef.current.fieldSub = pool.__ev__.addSub(fieldName, ({data}) => {
       setState(data[fieldName]);
     });
   }, [disabled]);
 
-  useEffect(() => {
-    return () => {
-      hookRef.current?.fieldSub?.unsubscribe();
-      hookRef.current.fieldSub = undefined;
-    };
-  }, []);
-
-  return [state as FieldValueType<T>, updateField];
+  return [state, updateField];
 }

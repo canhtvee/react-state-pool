@@ -1,27 +1,24 @@
 import {cloneObject, isFunction} from '../utils';
+import {addEventSubscription, dispatchEvent} from '../event';
+import {Field, FieldPath, FieldValue, getField, setField} from '../field';
 
-import {Field, FieldPath, FieldValue, getField} from '../field';
-
-import {PoolListener, PoolEvent} from './types';
-import {addEventSubscription, dispatchEvent, EventListeners} from '../event';
-import {setField} from '../field/services';
+import {PoolListener, PoolEvent, StatePool, PoolListeners} from './types';
 
 export function initStatePool<T extends Field>(initialData: T) {
   let current = {...cloneObject(initialData)};
-  let listeners = {} as EventListeners<PoolEvent<T>>;
+  let listeners: PoolListeners<T> = {};
 
-  const resetContext = () => {
+  const reset = () => {
     current = {...cloneObject(initialData)};
-    listeners = {} as EventListeners<PoolEvent<T>>;
+    listeners = {};
   };
-  const getContext = () => ({
+  const get = () => ({
     current,
     listeners,
   });
 
-  function getValue(fieldName?: FieldPath<T> | FieldPath<T>[]) {
-    return getField(fieldName, current);
-  }
+  const getValue = (fieldName?: FieldPath<T> | FieldPath<T>[]) =>
+    getField(fieldName, current);
 
   const setValue = (
     fieldName: FieldPath<T>,
@@ -42,18 +39,29 @@ export function initStatePool<T extends Field>(initialData: T) {
     );
   };
 
-  function subscribe(
+  const addSub = (
     fieldName: FieldPath<T> | FieldPath<T>[],
     listener: PoolListener<T>,
-  ) {
-    return addEventSubscription(fieldName, listener, listeners);
-  }
+  ) => addEventSubscription(fieldName, listener, listeners);
 
   return {
-    resetContext,
-    getContext,
+    reset,
+    get,
     setValue,
     getValue,
-    __ev__: {subscribe},
-  };
+    __ev__: {addSub},
+  } as StatePool<T>;
 }
+
+// const initial = {
+//   testString: 'string',
+//   testArray: ['string', 'number'],
+// };
+
+// const pool = initStatePool(initial);
+
+// pool.setValue('testArray', ['kaka']);
+// const arr = pool.getValue('testArray');
+// const str = pool.getValue('testString');
+
+// const [val1, val2] = pool.getValue(['testString', 'testArray']);
