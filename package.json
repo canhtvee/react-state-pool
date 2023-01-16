@@ -1,6 +1,6 @@
 {
   "name": "react-state-pool",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "source": "src/index.ts",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -29,7 +29,7 @@
     "build": "yarn clean; yarn tsc"
   },
   "dependencies": {
-    "react-hook-form": "^7.42.1"
+    "react-hook-form": "*"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.20.2",
