@@ -1,19 +1,18 @@
-import {FieldPath, Field, FieldValues} from './types';
+import {FieldPath, FieldValues} from 'react-hook-form';
 import {cloneObject, isArray} from '../utils';
 
-export function getField<T extends Field, P extends FieldPath<T>>(
-  fieldName: P[] | P | undefined,
-  current: T,
+export function getField<T extends FieldValues, P extends FieldPath<T>>(
+  fields: T,
+  path: P[] | P | undefined,
 ) {
-  if (!fieldName) {
-    return cloneObject(current);
+  if (!path) {
+    return cloneObject(fields);
   }
 
-  if (isArray(fieldName)) {
-    const values: FieldValues<T, P[]> = [];
-    fieldName.map(_name => current[_name]);
+  if (isArray(path)) {
+    const values = path.map(_path => fields[_path]);
     return cloneObject(values);
   }
 
-  return cloneObject(current[fieldName]);
+  return cloneObject(fields[path]);
 }

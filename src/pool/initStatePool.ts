@@ -1,10 +1,11 @@
 import {cloneObject, isFunction} from '../utils';
 import {addEventSubscription, dispatchEvent} from '../event';
-import {Field, FieldPath, FieldValue, getField, setField} from '../field';
+import {getField, setField} from '../field';
 
 import {PoolListener, PoolEvent, StatePool, PoolListeners} from './types';
+import {FieldPath, FieldValue, FieldValues} from 'react-hook-form';
 
-export function initStatePool<T extends Field>(initialData: T) {
+export function initStatePool<T extends FieldValues>(initialData: T) {
   let current = {...cloneObject(initialData)};
   let listeners: PoolListeners<T> = {};
 
@@ -18,7 +19,7 @@ export function initStatePool<T extends Field>(initialData: T) {
   });
 
   const getValue = (fieldName?: FieldPath<T> | FieldPath<T>[]) =>
-    getField(fieldName, current);
+    getField(current, fieldName);
 
   const setValue = (
     fieldName: FieldPath<T>,
@@ -28,7 +29,7 @@ export function initStatePool<T extends Field>(initialData: T) {
       ? updatingValue(getField(fieldName, current) as FieldValue<T>)
       : updatingValue;
 
-    setField(fieldName, newValue, current);
+    setField(current, fieldName, newValue);
 
     dispatchEvent(
       {
@@ -52,16 +53,3 @@ export function initStatePool<T extends Field>(initialData: T) {
     __ev__: {addSub},
   } as StatePool<T>;
 }
-
-// const initial = {
-//   testString: 'string',
-//   testArray: ['string', 'number'],
-// };
-
-// const pool = initStatePool(initial);
-
-// pool.setValue('testArray', ['kaka']);
-// const arr = pool.getValue('testArray');
-// const str = pool.getValue('testString');
-
-// const [val1, val2] = pool.getValue(['testString', 'testArray']);

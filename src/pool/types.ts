@@ -1,51 +1,66 @@
-import {AddEventSubscription, EventListener, EventListeners} from '../event';
-import {FieldPath, Field, FieldValue, GetField} from '../field';
+import {
+  FieldPath,
+  FieldValues,
+  FieldPathValue,
+  UseFormGetValues,
+} from 'react-hook-form';
 
-export type PoolEvent<T extends Field> = {
+import {EventListener, EventListeners, EventSubscription} from '../event';
+
+export type PoolEvent<T extends FieldValues> = {
   eventName: FieldPath<T>;
-  data: FieldValue<T, FieldPath<T>>;
+  data: Pick<T, FieldPath<T>>;
 };
 
-export type PoolListener<T extends Field> = EventListener<PoolEvent<T>>;
-export type PoolListeners<T extends Field> = Partial<
-  EventListeners<PoolEvent<T>>
->;
+export type PoolListener<T extends FieldValues> = EventListener<PoolEvent<T>>;
+export type PoolListeners<T extends FieldValues> = EventListeners<PoolEvent<T>>;
 
-export type PoolContext<T extends Field> = {
+export type AddPoolEventSubscription<T extends FieldValues> = (
+  eventName: PoolEvent<T>['eventName'],
+  listener: PoolListener<T>,
+) => EventSubscription;
+
+export type PoolContext<T extends FieldValues> = {
   current: T;
   listeners: PoolListeners<T>;
 };
 
-export type StatePoolUpdatingValue<T extends Field, P extends FieldPath<T>> =
-  | FieldValue<T, P>
-  | ((prev: FieldValue<T, P>) => FieldValue<T, P>);
+export type StatePoolUpdatingValue<
+  T extends FieldValues,
+  P extends FieldPath<T>,
+> =
+  | FieldPathValue<T, P>
+  | ((prev: FieldPathValue<T, P>) => FieldPathValue<T, P>);
 
-export type StatePool<T extends Field> = {
+export type StatePoolSetValue<T extends FieldValues> = <P extends FieldPath<T>>(
+  fieldName: P,
+  value: StatePoolUpdatingValue<T, P>,
+) => void;
+
+export type StatePool<T extends FieldValues> = {
   reset: () => void;
   get: () => PoolContext<T>;
+  setValue: StatePoolSetValue<T>;
+  getValue: UseFormGetValues<T>;
 
-  setValue: <P extends FieldPath<T>>(
-    fieldName: P,
-    updatingValue: StatePoolUpdatingValue<T, P>,
-  ) => void;
-
-  getValue: GetField<T>;
-
-  __ev__: {addSub: AddEventSubscription<PoolEvent<T>>};
+  __ev__: {addSub: AddPoolEventSubscription<T>};
 };
 
-export type UsePoolStateProps<T extends Field, P extends FieldPath<T>> = {
+export type UsePoolStateProps<T extends FieldValues, P extends FieldPath<T>> = {
   fieldName: P;
   pool: StatePool<T>;
   disabled?: boolean;
 };
 
-export type UsePoolStateReturns<T extends Field, P extends FieldPath<T>> = [
-  FieldValue<T, P> | undefined,
+export type UsePoolStateReturns<
+  T extends FieldValues,
+  P extends FieldPath<T>,
+> = [
+  FieldPathValue<T, P> | undefined,
   (updatingValue: StatePoolUpdatingValue<T, P>) => void,
 ];
 
-export type UsePoolState<T extends Field, P extends FieldPath<T>> = ({
+export type UsePoolState<T extends FieldValues, P extends FieldPath<T>> = ({
   fieldName,
   pool,
   disabled,

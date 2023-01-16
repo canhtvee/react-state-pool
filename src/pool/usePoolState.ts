@@ -1,6 +1,5 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
-
-import {Field, FieldPath} from '../field';
+import {FieldPath, FieldValues} from 'react-hook-form';
 
 import {
   StatePoolUpdatingValue,
@@ -8,10 +7,10 @@ import {
   UsePoolStateReturns,
 } from './types';
 
-export function usePoolState<T extends Field, P extends FieldPath<T>>({
+export function usePoolState<T extends FieldValues, P extends FieldPath<T>>({
+  pool,
   fieldName,
   disabled,
-  pool,
 }: UsePoolStateProps<T, P>): UsePoolStateReturns<T, P> {
   const [state, setState] = useState(() =>
     disabled ? undefined : pool.getValue(fieldName),
