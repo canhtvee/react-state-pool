@@ -1,11 +1,12 @@
-import {addListener} from '../../event/addListener';
+import {dispatchEvent} from '../../event/dispatchEvent';
+import {addEventSubscription} from '../../event/addEventSubscription';
 
 /**
  * Run test command
  * yarn test -u -t="dispatchEvent"
  */
 
-describe('addListener', () => {
+describe('dispatchEvent', () => {
   let listeners = {};
 
   beforeEach(() => {
@@ -14,17 +15,18 @@ describe('addListener', () => {
     };
   });
 
-  test('should add listener correctly', () => {
-    const name = 'name';
+  test('should dispatch event correctly', () => {
     const mockListener = jest.fn();
-    const removeListner = addListener(name, mockListener, listeners);
+    addEventSubscription(['name1', 'name2'], mockListener, listeners);
 
-    expect(listeners[name].length).toEqual(1);
-    expect(listeners[name].includes(mockListener)).toBeTruthy();
+    dispatchEvent({eventName: 'name1'}, listeners);
+    expect(mockListener).toHaveBeenCalledTimes(1);
 
-    removeListner();
+    dispatchEvent({eventName: 'name2'}, listeners);
+    expect(mockListener).toHaveBeenCalledTimes(2);
 
-    expect(listeners[name].includes(mockListener)).toBeFalsy();
-    expect(listeners[name].length).toEqual(0);
+    const _event = {eventName: 'name1', data: {test: 'test'}};
+    dispatchEvent(_event, listeners);
+    expect(mockListener).toHaveBeenCalledWith(_event);
   });
 });

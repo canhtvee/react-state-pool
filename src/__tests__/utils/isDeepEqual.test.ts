@@ -1,4 +1,4 @@
-import {isDeepEqual} from '../utils';
+import {isDeepEqual} from '../../utils';
 
 /**
  * Run test command

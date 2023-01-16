@@ -41,7 +41,7 @@ export type StatePool<T extends FieldValues> = {
   reset: () => void;
   get: () => PoolContext<T>;
   setValue: StatePoolSetValue<T>;
-  getValue: UseFormGetValues<T>;
+  getValues: UseFormGetValues<T>;
 
   __ev__: {addSub: AddPoolEventSubscription<T>};
 };

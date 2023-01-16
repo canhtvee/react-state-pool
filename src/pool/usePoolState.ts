@@ -13,7 +13,7 @@ export function usePoolState<T extends FieldValues, P extends FieldPath<T>>({
   disabled,
 }: UsePoolStateProps<T, P>): UsePoolStateReturns<T, P> {
   const [state, setState] = useState(() =>
-    disabled ? undefined : pool.getValue(fieldName),
+    disabled ? undefined : pool.getValues(fieldName),
   );
   /**
    * To ensure that state's watching is fired synchronously, immediately right after state's declaration
@@ -58,7 +58,7 @@ export function usePoolState<T extends FieldValues, P extends FieldPath<T>>({
       return;
     }
 
-    setState(pool.getValue(fieldName));
+    setState(pool.getValues(fieldName));
     hookRef.current.fieldSub = pool.__ev__.addSub(fieldName, ({data}) => {
       setState(data[fieldName]);
     });
