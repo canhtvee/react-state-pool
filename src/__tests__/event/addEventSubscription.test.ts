@@ -26,14 +26,11 @@ describe('addEventSubscription', () => {
     );
     expect(listeners['name2'].includes(mockListener)).toBeTruthy();
     expect(listeners['name3'].includes(mockListener)).toBeTruthy();
-    console.log(listeners);
 
     name1Sub.unsubscribe();
     name2n3Sub.unsubscribe();
     expect(listeners['name1'].length).toEqual(0);
     expect(listeners['name2'].length).toEqual(0);
     expect(listeners['name3'].length).toEqual(0);
-
-    console.log(listeners);
   });
 });

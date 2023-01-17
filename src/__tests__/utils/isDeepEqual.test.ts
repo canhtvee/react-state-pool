@@ -122,4 +122,19 @@ describe('isDeepEqual', () => {
       isDeepEqual({test: new Date('1990')}, {test: new Date('1990')}),
     ).toBeTruthy();
   });
+
+  expect(
+    isDeepEqual(
+      {
+        obj1: null,
+        obj2: {test: undefined, notNull: true},
+        obj3: {test: '455'},
+      },
+      {
+        obj3: {test: '455'},
+        obj1: null,
+        obj2: {notNull: true, test: undefined},
+      },
+    ),
+  ).toBeTruthy();
 });
