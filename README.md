@@ -1,8 +1,8 @@
 # react-state-pool
 
-A simple library to for state management in react applications.
+A simple library for state management in react applications.
 This library is kept as simple as possile. It aimes to tackle only one issue is to make global data become global state.
-It is built on top of react hook, all best practices of using react hook should be applied
+It is built on top of react hook, all the best practices of using react hook should be applied.
 <br/>
 
 ## Installation
@@ -31,7 +31,7 @@ See below example to know how to use this library
 ```jsx
 import {initStatePool} from 'react-state-pool';
 
-const inititalData = {count: undefined};
+const inititalData = {count: null};
 const myPool = initStatePool(initialdata);
 
 // Use disabled argument to dynamically subcribe and unsubcribe state update
@@ -63,3 +63,5 @@ export async function getData() {
 
 1. This library is fully type supported, you should defined type or initial data to make type recommendation works
 2. Defining initial data is recommended to improve code's readability
+
+## [Documentation](https://github.com/canhtvee/react-state-pool/tree/master/docs)

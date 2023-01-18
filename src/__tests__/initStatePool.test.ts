@@ -1,7 +1,7 @@
 import {act} from '@testing-library/react';
 
-import {initStatePool} from '../../pool';
-import {isDeepEqual} from '../../utils';
+import {isDeepEqual} from '../utils';
+import {initStatePool} from '../initStatePool';
 
 /**
  * Run test command

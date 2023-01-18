@@ -26,7 +26,9 @@
     "lint:fix": "yarn lint -- --fix",
     "clean": "rm -r dist",
     "tsc": "tsc --build",
-    "build": "yarn clean; yarn tsc"
+    "build": "yarn clean; yarn tsc",
+    "public": "npm publish --access public",
+    "git:graph": "git log --graph --pretty=oneline --abbrev-commit"
   },
   "dependencies": {
     "react-hook-form": "*"

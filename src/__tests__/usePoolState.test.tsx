@@ -2,7 +2,8 @@ import React, {useState} from 'react';
 import {act, cleanup, render} from '@testing-library/react';
 import {renderHook} from '@testing-library/react-hooks';
 
-import {initStatePool, usePoolState} from '../../pool';
+import {initStatePool} from '../initStatePool';
+import {usePoolState} from '../usePoolState';
 
 /**
  * Run test command

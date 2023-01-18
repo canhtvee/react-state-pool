@@ -5,7 +5,7 @@ import {
   UseFormGetValues,
 } from 'react-hook-form';
 
-import {EventListener, EventListeners, EventSubscription} from '../event';
+import {EventListener, EventListeners, EventSubscription} from './event';
 
 export type PoolEvent<T extends FieldValues> = {
   eventName: FieldPath<T>;

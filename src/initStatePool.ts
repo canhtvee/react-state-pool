@@ -1,7 +1,7 @@
 import {FieldPath, FieldValue, FieldValues} from 'react-hook-form';
 
-import {cloneObject, isArray, isFunction} from '../utils';
-import {addEventSubscription, dispatchEvent} from '../event';
+import {cloneObject, isArray, isFunction} from './utils';
+import {addEventSubscription, dispatchEvent} from './event';
 
 import {
   PoolListener,
