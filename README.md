@@ -1,9 +1,22 @@
 # react-state-pool
 
-A simple library for state management in react applications.
-This library is kept as simple as possile. It aimes to tackle only one issue is to make global data become global state.
-It is built on top of react hook, all the best practices of using react hook should be applied.
+This is a simple library to manage state in react applications.
+To avoid messing up state management, it aims to tackle only one issue is making global data become global state with a minimum number of APIs. All APIs are very easy to start with.
 <br/>
+
+<div align="center">
+  <p>
+    <a href="https://www.npmjs.com/package/react-state-pool">
+      <img src="https://img.shields.io/npm/v/react-state-pool.svg?style=for-the-badge" alt=""/>
+    </a>
+    <a href="https://www.npmjs.com/package/react-state-pool">
+      <img src="https://img.shields.io/npm/dm/react-state-pool?style=for-the-badge" alt=""/>
+    </a>
+    <a href="https://www.npmjs.com/package/react-state-pool">
+      <img src="https://img.shields.io/npm/dt/react-state-pool?style=for-the-badge" alt=""/>
+      </a>
+  </p>
+</div>
 
 ## Installation
 
@@ -17,16 +30,18 @@ Or
 npm install react-state-pool
 ```
 
-<br/>
+## Features
 
-## How to use
+- Small size and simple APIs
+- Fully type supported
+- Subscribe and unsubscribe to state update dynamicaly
 
-It requires two step to use this library
+## Quickstart
 
-1. Initialize a state pool where sharing data is stored by `initStatePool`
+It requires two steps to use this library
+
+1. Initialize a state pool where global data is stored by using `initStatePool`
 2. Use `usePoolState` hook to use data stored in state pool as global state inside component
-
-See below example to know how to use this library
 
 ```jsx
 import {initStatePool} from 'react-state-pool';
@@ -34,12 +49,12 @@ import {initStatePool} from 'react-state-pool';
 const inititalData = {count: null};
 const myPool = initStatePool(initialdata);
 
-// Use disabled argument to dynamically subcribe and unsubcribe state update
+// Use disabled argument to subcribe and unsubcribe to state update dynamically
 function Playground(props) {
   const [count, setCount] = usePoolState({
     pool,
     fieldName: 'count',
-    disabled: props?.notWatch,
+    disabled: props?.disabled,
   });
 
   return (
@@ -58,10 +73,5 @@ export async function getData() {
 ```
 
 <br/>
-
-## Best practices
-
-1. This library is fully type supported, you should defined type or initial data to make type recommendation works
-2. Defining initial data is recommended to improve code's readability
 
 ## [Documentation](https://github.com/canhtvee/react-state-pool/tree/master/docs)
