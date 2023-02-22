@@ -1,6 +1,6 @@
 {
   "name": "react-state-pool",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "source": "src/index.ts",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,7 +11,8 @@
     "state",
     "state-pool",
     "react",
-    "react-native"
+    "react-native",
+    "hook"
   ],
   "repository": {
     "type": "git",
@@ -30,8 +31,9 @@
     "public": "npm publish --access public",
     "git:graph": "git log --graph --pretty=oneline --abbrev-commit"
   },
-  "dependencies": {
-    "react-hook-form": "*"
+  "peerDependencies": {
+    "react-hook-form": "^6 || ^7",
+    "react": "^16.8.0 || ^17 || ^18"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.20.2",
@@ -55,6 +57,7 @@
     "prettier": "^2.8.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.43.2",
     "react-test-renderer": "18.1.0",
     "typescript": "^4.9.4"
   },
